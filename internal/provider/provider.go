@@ -33,16 +33,20 @@ type hashicupsProvider struct {
 
 // Metadata returns the provider type name.
 func (p *hashicupsProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
+	// provider에 정의한 모든 resource / datasource에 포함되는 이름이 typeName.
+	// AWS의 경우 aws_ 형태. 이 예시의 경우 hashicups_ 형태로 리소스가 정의된다.
     resp.TypeName = "hashicups"
     resp.Version = p.version
 }
 
 // Schema defines the provider-level schema for configuration data.
 func (p *hashicupsProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
+	// attributes available on your provider.
     resp.Schema = schema.Schema{}
 }
 
 // Configure prepares a HashiCups API client for data sources and resources.
+// -> provider가 running하기 위해 필요한 로직을 넣는 함수. 보통 authentication이 들어감.
 func (p *hashicupsProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
 }
 
