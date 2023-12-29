@@ -101,7 +101,50 @@ func (d *coffeesDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 	}
 }
 
+// terraform의 plan / apply / destroy 메소드로 lifecycle을 정상적으로 동작하려면 CRUD를 구현해야 함.
+// 이건 data source이므로, read만 있으면 된다. 
+// (그냥 resource라면 CRUD를 전부 구현해야 한다.)
+// Read refreshes the Terraform state with the latest data.
 func (d *coffeesDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+  var state coffeesDataSourceModel
+
+	// client API로 필요한 리소스 가져온다.
+  coffees, err := d.client.GetCoffees()
+  if err != nil {
+    resp.Diagnostics.AddError(
+      "Unable to Read HashiCups Coffees",
+      err.Error(),
+    )
+    return
+  }
+
+  // Map response body to model
+	// client API 리소스를 terraform struct에 매핑한다 (conversion)
+  for _, coffee := range coffees {
+    coffeeState := coffeesModel{
+      ID:          types.Int64Value(int64(coffee.ID)),
+      Name:        types.StringValue(coffee.Name),
+      Teaser:      types.StringValue(coffee.Teaser),
+      Description: types.StringValue(coffee.Description),
+      Price:       types.Float64Value(coffee.Price),
+      Image:       types.StringValue(coffee.Image),
+    }
+
+    for _, ingredient := range coffee.Ingredient {
+      coffeeState.Ingredients = append(coffeeState.Ingredients, coffeesIngredientsModel{
+        ID: types.Int64Value(int64(ingredient.ID)),
+      })
+    }
+
+    state.Coffees = append(state.Coffees, coffeeState)
+  }
+
+  // Set state. 매핑한 정보를 terraform state에 저장한다.
+  diags := resp.State.Set(ctx, &state)
+  resp.Diagnostics.Append(diags...)
+  if resp.Diagnostics.HasError() {
+    return
+  }
 }
 
 // Configure adds the provider configured client to the data source.

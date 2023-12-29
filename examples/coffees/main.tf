@@ -15,3 +15,8 @@ provider "hashicups" {
 }
 
 data "hashicups_coffees" "edu" {}
+
+// verify data sources를 위한 block
+output "edu_coffees" {
+  value = data.hashicups_coffees.edu
+}
