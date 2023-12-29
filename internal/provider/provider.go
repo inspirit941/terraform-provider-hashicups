@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -31,6 +32,15 @@ type hashicupsProvider struct {
     version string
 }
 
+// hashicupsProviderModel maps provider schema data to a Go type.
+// schema에 정의한 필드를 provider 서버에서 Marshal / unmarshal하기 위한 struct
+type hashicupsProviderModel struct {
+    Host     types.String `tfsdk:"host"`
+    Username types.String `tfsdk:"username"`
+    Password types.String `tfsdk:"password"`
+}
+
+
 // Metadata returns the provider type name.
 func (p *hashicupsProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
 	// provider에 정의한 모든 resource / datasource에 포함되는 이름이 typeName.
@@ -42,7 +52,21 @@ func (p *hashicupsProvider) Metadata(_ context.Context, _ provider.MetadataReque
 // Schema defines the provider-level schema for configuration data.
 func (p *hashicupsProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
 	// attributes available on your provider.
-    resp.Schema = schema.Schema{}
+	// 예시의 경우 username, password를 입력받아서 authentication을 수행하도록 한다.
+    resp.Schema = schema.Schema{
+        Attributes: map[string]schema.Attribute{
+            "host": schema.StringAttribute{
+                Optional: true,
+            },
+            "username": schema.StringAttribute{
+                Optional: true,
+            },
+            "password": schema.StringAttribute{
+                Optional:  true,
+                Sensitive: true,
+            },
+        },
+    }
 }
 
 // Configure prepares a HashiCups API client for data sources and resources.
