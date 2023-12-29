@@ -176,6 +176,8 @@ func (p *hashicupsProvider) Configure(ctx context.Context, req provider.Configur
 
     // Create a new HashiCups client using the configuration values
 	// -> go get github.com/hashicorp-demoapp/hashicups-client-go@v0.1.0 으로 불러온 것. 실제로는 client도 있어야하는 듯.
+	// client api와 terraform provider 분리하는 장점?
+	// - 에러 디버깅 편의성. 에러 발생했을 때 terraform provider 로직인지 / client api 로직 문제인지 파악이 쉽다
     client, err := hashicups.NewClient(&host, &username, &password)
     if err != nil {
         resp.Diagnostics.AddError(
