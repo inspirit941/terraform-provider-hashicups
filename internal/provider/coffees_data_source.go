@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp-demoapp/hashicups-client-go"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -24,6 +25,29 @@ func NewCoffeesDataSource() datasource.DataSource {
 // -> api call 수행하기 위한 client를 struct에 포함한다.
 type coffeesDataSource struct {
 	client *hashicups.Client
+}
+
+
+/// Marshal / Unmarshal go struct with terraform data struct, by the name of the attribute.
+// coffeesDataSourceModel maps the data source schema data. -> list of coffees
+type coffeesDataSourceModel struct {
+	Coffees []coffeesModel `tfsdk:"coffees"`
+}
+
+// coffeesModel maps coffees schema data. -> coffee element
+type coffeesModel struct {
+	ID          types.Int64               `tfsdk:"id"`
+	Name        types.String              `tfsdk:"name"`
+	Teaser      types.String              `tfsdk:"teaser"`
+	Description types.String              `tfsdk:"description"`
+	Price       types.Float64             `tfsdk:"price"`
+	Image       types.String              `tfsdk:"image"`
+	Ingredients []coffeesIngredientsModel `tfsdk:"ingredients"`
+}
+
+// coffeesIngredientsModel maps coffee ingredients data
+type coffeesIngredientsModel struct {
+	ID types.Int64 `tfsdk:"id"`
 }
 
 func (d *coffeesDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
