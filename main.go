@@ -32,6 +32,8 @@ var (
 	// https://goreleaser.com/cookbooks/using-main.version/
 )
 
+// main.go: 일종의 EntryPoint. serve your provider / make it available for terraform over RPC
+// 통신 과정에서 terraform core와 provider 간 의존성을 낮추는 역할. 
 func main() {
 	var debug bool
 
