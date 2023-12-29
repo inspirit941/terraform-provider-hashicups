@@ -35,20 +35,24 @@ var (
 // main.go: 일종의 EntryPoint. serve your provider / make it available for terraform over RPC
 // 통신 과정에서 terraform core와 provider 간 의존성을 낮추는 역할. 
 func main() {
-	var debug bool
+    var debug bool
 
-	flag.BoolVar(&debug, "debug", false, "set to true to run the provider with support for debuggers like delve")
-	flag.Parse()
+    flag.BoolVar(&debug, "debug", false, "set to true to run the provider with support for debuggers like delve")
+    flag.Parse()
 
-	opts := providerserver.ServeOpts{
-		// TODO: Update this string with the published name of your provider.
-		Address: "registry.terraform.io/hashicorp/scaffolding",
-		Debug:   debug,
-	}
+    opts := providerserver.ServeOpts{
+        // NOTE: This is not a typical Terraform Registry provider address,
+        // such as registry.terraform.io/hashicorp/hashicups. This specific
+        // provider address is used in these tutorials in conjunction with a
+        // specific Terraform CLI configuration for manual development testing
+        // of this provider.
+        Address: "hashicorp.com/edu/hashicups", // 원래 여기는 registry.terraform.io 형태이지만, hashicups라는 예시를 로컬에서 동작시키기 위해 수정.
+        Debug:   debug,
+    }
 
-	err := providerserver.Serve(context.Background(), provider.New(version), opts)
+    err := providerserver.Serve(context.Background(), provider.New(version), opts)
 
-	if err != nil {
-		log.Fatal(err.Error())
-	}
+    if err != nil {
+        log.Fatal(err.Error())
+    }
 }
